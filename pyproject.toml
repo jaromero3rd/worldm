@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spr"
+version = "0.1.0"
+description = "Learning policy representation for steerable behavior synthesis"
+readme = { file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.8"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "torch>=2.0.0",
+    "PyYAML",
+    "gymnasium",
+    "gymnasium[mujoco]",
+    "tensorboard",
+    "wandb",
+    "tqdm",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["spr"]
+
+[tool.isort]
+py_version = 38
+line_length = 120
+group_by_package = true
+
+sections = [
+    "FUTURE",
+    "STDLIB",
+    "THIRDPARTY",
+    "FIRSTPARTY",
+    "LOCALFOLDER",
+]
+
+known_first_party = ["spr"]
+
+[tool.black]
+line-length = 120
+target-version = ["py38"]

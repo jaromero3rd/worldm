@@ -1,0 +1,64 @@
+default: &default
+  seed: 0
+  env_cfg:
+    num_envs: 16
+
+  alg_cfg:
+    class: PPO
+    num_learning_epochs: 10
+    num_mini_batches: 8
+    num_steps_per_env: 1024
+    clip_param: 0.2
+    use_clipped_value_loss: false
+    gamma: 0.99
+    lam: 0.95
+    actor_learning_rate: 3.e-4
+    critic_learning_rate: 3.e-4
+    max_grad_norm: 0.5
+    value_loss_coef: 0.5
+    entropy_coef: 0
+    action_bound_method: clip
+    action_scaling: true
+    mixed_precision: false
+    obs_normalization: true
+    reward_normalization: true
+    policy_cfg:
+      actor_cfg:
+        type: mlp
+        hidden_dims: [256, 256]
+        activation: relu
+        init_noise_std: 0.6
+        min_log_noise_std: -20.0
+        max_log_noise_std: 2.0
+        noise_std_type: log
+      critic_cfg:
+        type: mlp
+        hidden_dims: [256, 256]
+        activation: relu
+
+  train_cfg: &train_default
+    eval_freq: 5
+    eval_episodes: 8
+    num_learning_iterations: 300
+    wandb_project: "actor-critic"
+    save_interval: 1
+    upload_model: false
+    store_code_state: true
+
+mo-hopper-v5:
+  <<: *default
+  train_cfg:
+    <<: *train_default
+    num_learning_iterations: 200
+
+mo-hopper-2obj-v5:
+  <<: *default
+  train_cfg:
+    <<: *train_default
+    num_learning_iterations: 200
+
+mo-swimmer-v5:
+  <<: *default
+  train_cfg:
+    <<: *train_default
+    num_learning_iterations: 100
