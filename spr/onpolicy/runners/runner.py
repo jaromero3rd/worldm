@@ -222,9 +222,13 @@ class Runner:
         for i in range(num_vectors):
             if self.n_objs == 2:
                 # For 2 objectives, create weights from [1, 0] to [0, 1]
-                w2 = i / (num_vectors - 1) if num_vectors > 1 else 0.5
-                w1 = 1 - w2
-                weight_vectors.append([w1, w2])
+                t = i / (num_vectors - 1) if num_vectors > 1 else 0.5
+
+                theta = np.pi * (1-t)
+
+                w1 = np.cos(theta)
+                w2 = np.sin(theta)
+                weight_vectors.append([w1,w2])
             else:
                 # For more objectives, use Dirichlet distribution
                 alpha = np.ones(self.n_objs)  # Uniform Dirichlet

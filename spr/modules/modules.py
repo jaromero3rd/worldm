@@ -40,6 +40,48 @@ class MLP(nn.Module):
         return x
 
 
+class ResidualBlock(nn.Module):
+    def __init__(self, in_dim: int, out_dim: int, activation: str = "relu"):
+        super().__init__()
+        activation_fn = resolve_nn_activation(activation)
+        self.net = nn.Sequential(
+            nn.Linear(in_dim, out_dim),
+            nn.LayerNorm(out_dim),
+            activation_fn,
+            nn.Linear(out_dim, out_dim),
+            nn.LayerNorm(out_dim),
+        )
+        self.shortcut = nn.Identity() if in_dim == out_dim else nn.Linear(in_dim, out_dim)
+        self.activation = activation_fn
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.activation(self.shortcut(x) + self.net(x))
+
+
+class ResNet18(nn.Module):
+    def __init__(
+        self,
+        input_dim: int,
+        output_dim: int,
+        activation: str = "relu",
+    ):
+        super().__init__()
+        self.input_proj = nn.Linear(input_dim, 64)
+        self.layer1 = nn.Sequential(ResidualBlock(64, 64, activation), ResidualBlock(64, 64, activation))
+        self.layer2 = nn.Sequential(ResidualBlock(64, 128, activation), ResidualBlock(128, 128, activation))
+        self.layer3 = nn.Sequential(ResidualBlock(128, 256, activation), ResidualBlock(256, 256, activation))
+        self.layer4 = nn.Sequential(ResidualBlock(256, 512, activation), ResidualBlock(512, 512, activation))
+        self.output_proj = nn.Linear(512, output_dim)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.input_proj(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        return self.output_proj(x)
+
+
 class SelfAttentionBlock(nn.Module):
     def __init__(self, config):
         super().__init__()
